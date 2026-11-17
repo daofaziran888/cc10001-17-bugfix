@@ -9,6 +9,7 @@ from typing import Any
 
 from app.store import store
 from app.services.quality_check import QualityCheckService
+from app.services.result_store import ResultStoreService
 
 RESULT_MODULE = "result_store"
 
@@ -16,6 +17,7 @@ RESULT_MODULE = "result_store"
 class QualityAuditor:
     def __init__(self) -> None:
         self._qc_svc = QualityCheckService()
+        self._result_svc = ResultStoreService()
 
     def _next_audit_id(self) -> int:
         rows = store.joint_rows("audit_records")
@@ -71,9 +73,15 @@ class QualityAuditor:
         }
         store.joint_append("audit_records", record)
 
-        # 更新批次状态
-        batch["status"] = "校验通过" if verdict == "通过" else "校验失败"
-        batch["pending"] = verdict != "通过"
+        # 更新批次状态：走采集仓储的统一状态入口，保证写状态变更记录、
+        # 结论同步回写质量审计清单，且同一个原因贯穿批次状态与审计入口。
+        reason = "; ".join(issues) if issues else "完整性与有效率校验通过"
+        self._result_svc.apply_audit_result(
+            batch_id,
+            verdict,
+            f"质量审计：{reason}（{actual}）",
+            audit_entry_id=audit_entry["id"],
+        )
 
         return {
             "ok": True,

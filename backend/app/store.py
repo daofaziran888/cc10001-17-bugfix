@@ -27,6 +27,7 @@ class Store:
             "proxy_assignments": [],   # 代理分配记录
             "cookie_rotations": [],    # 凭证轮换记录
             "scheduler_triggers": [],  # 调度触发记录
+            "status_changes": [],      # 采集仓储批次状态变更记录（原状态/目标状态/动作/原因）
         }
         self._load_joint()
 
@@ -92,6 +93,10 @@ class Store:
 
     def joint_append(self, key: str, record: dict[str, Any]) -> None:
         self._joint.setdefault(key, []).append(record)
+        self._save_joint(key)
+
+    def joint_save(self, key: str) -> None:
+        """把已就地修改的联合存储表重新落盘（例如补写关联字段）。"""
         self._save_joint(key)
 
     def joint_find(self, key: str, record_id: int) -> dict[str, Any] | None:

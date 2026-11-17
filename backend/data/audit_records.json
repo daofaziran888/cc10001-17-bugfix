@@ -26,5 +26,25 @@
     "verdict": "通过",
     "issues": [],
     "audited_at": "2026-11-16 10:57:45"
+  },
+  {
+    "id": 4,
+    "batch_id": 4,
+    "audit_entry_id": 6,
+    "verdict": "不通过",
+    "issues": [
+      "校验摘要过短"
+    ],
+    "audited_at": "2026-11-17 03:53:27"
+  },
+  {
+    "id": 5,
+    "batch_id": 1,
+    "audit_entry_id": 8,
+    "verdict": "不通过",
+    "issues": [
+      "校验摘要过短"
+    ],
+    "audited_at": "2026-11-17 03:53:52"
   }
 ]
